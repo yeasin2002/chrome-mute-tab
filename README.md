@@ -16,6 +16,8 @@ Basically, instead of right-clicking the tab → mute, you just click the extens
 Click the 🔊 icon on a tab to mute
 Right-click → “Mute site”
 
+- mute/unmute should respect users theme (dark or light)
+
 ## But the problem statement: 
 But it doesn't make me mute a specific tab of some sites. 
 For example, i opend in fb site, and I want only the tab to mute. 
