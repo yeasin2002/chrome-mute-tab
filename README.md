@@ -1,80 +1,119 @@
-# MuteTab — Chrome Extension
+# MuteTab
 
-> Mute any browser tab instantly, with one click.
+Mute or unmute the active browser tab with one click.
 
 **GitHub:** https://github.com/yeasin2002/chrome-mute-tab
 
----
+## Overview
 
-## What is MuteTab?
+MuteTab is a minimal browser extension built for one job: toggling the mute state of the currently active tab from the toolbar button.
 
-MuteTab is a simple Chrome extension that lets you mute or unmute any tab instantly — just by clicking the extension icon. No right-clicking, no hunting through tabs, no extra steps.
+The current project is a small `WXT` + `TypeScript` codebase with a background entrypoint and a few focused helpers. There is no popup, options page, or extra UI in v1.
 
----
+## Current Scope
 
-## The Problem
+- Toggle the active tab between muted and unmuted from the extension icon
+- Update the toolbar icon based on the current tab state
+- Update the toolbar title between `Mute this tab` and `Unmute this tab`
+- Re-sync action state on install, browser startup, tab activation, tab updates, and window focus changes
+- Fail safely when tabs or windows disappear during async updates
 
-Chrome already has a way to mute tabs — you can click the sound icon on a tab, or right-click and choose "Mute site." But here's where it falls short:
+## How It Works
 
-When you mute a **site**, Chrome mutes **all tabs** from that site at once.
+`app/background.ts` owns the extension lifecycle.
 
-So if you have three Facebook tabs open and only one of them is playing an annoying video, you can't mute just that one tab. Chrome will mute everything from Facebook — which is not always what you want.
+- On click, it flips the mute state of the current tab
+- On install and startup, it synchronizes the action icon/title
+- On tab activation, tab updates, and window focus changes, it refreshes the current action state
 
-MuteTab fixes this. It gives you control over **one tab at a time**, not the whole site.
+The helper layer keeps each responsibility separate:
 
----
+- `helpers/toggle-tab-mute-state.ts` updates the tab mute state
+- `helpers/apply-tab-action-state.ts` sets the icon and action title
+- `helpers/get-tab-action-state-source.ts` resolves the active tab to inspect
+- `helpers/sync-tab-action-state.ts` keeps the toolbar state accurate
+- `helpers/tab-action-state.constants.ts` stores icon and title mappings
 
-## The Solution
+## Tech Stack
 
-A small Chrome extension with one job: **mute or unmute the current tab with a single click.**
+- `WXT` for extension development and bundling
+- `TypeScript`
+- `Biome` for formatting and linting
 
-- Click the icon → tab is muted
-- Click again → tab is unmuted
-- The icon changes to show you the current state (playing or muted)
-- Works with both light and dark browser themes
+## Permissions
 
-That's it. Simple, fast, and does exactly what you need.
+The extension currently uses only one manifest permission:
 
----
+- `tabs` to read and update the active tab mute state
 
-## Who Is This For?
+## Project Structure
 
-Anyone who uses Chrome and has ever been caught off guard by:
+```text
+app/
+  background.ts
+helpers/
+  apply-tab-action-state.ts
+  get-tab-action-state-source.ts
+  index.ts
+  sync-tab-action-state.ts
+  tab-action-state.constants.ts
+  toggle-tab-mute-state.ts
+public/
+  sound-mute.png
+  sound-on.png
+```
 
-- A video that auto-plays with sound
-- A noisy ad on a site
-- One specific tab making noise while you want the rest to stay on
+## Development
 
-No technical knowledge needed. Just install and click.
+### Install
 
----
+```bash
+pnpm install
+```
 
-## Current Version (v1 — Prototype)
+### Run in Development
 
-The first version is intentionally kept minimal:
+```bash
+pnpm dev
+```
 
-| Feature | Status |
-|---|---|
-| Mute / unmute current tab | ✅ Included |
-| One-click from extension icon | ✅ Included |
-| Icon changes based on mute state | ✅ Included |
-| Light & dark theme icon support | ✅ Included |
+### Build
 
----
+```bash
+pnpm build
+```
 
-## Future Ideas
+### Package
 
-These are not planned yet, but could be added later based on need:
+```bash
+pnpm zip
+```
 
-- **Keyboard shortcut** — mute/unmute without even clicking the icon
-- **Mute all tabs at once** — silence everything in one go
-- **Auto-mute rules** — always mute specific sites automatically
-- **Tab mute history** — see which tabs were muted during a session
-- **Badge indicator** — show a small count or symbol on the icon for quick status
-- **Mute on open** — option to mute a tab the moment it opens
+## Available Scripts
 
----
+- `pnpm dev` starts WXT in development mode
+- `pnpm dev:firefox` starts the Firefox dev build
+- `pnpm build` creates a production build
+- `pnpm build:firefox` creates a Firefox production build
+- `pnpm zip` creates a distributable zip
+- `pnpm zip:firefox` creates a Firefox distributable zip
+- `pnpm compile` runs `tsc --noEmit`
+- `pnpm fix` runs Biome with `--write`
 
-## Summary
+## Current Version
 
-MuteTab is about speed and convenience. Chrome's built-in mute is good, but it's not precise enough when you have multiple tabs from the same site open. This extension fills that gap — no clutter, no settings to dig through, just one click to silence what's bothering you.
+- Package version: `0.1.0`
+- Status: prototype / v1 baseline
+
+## Roadmap Ideas
+
+- Keyboard shortcut support
+- Mute all tabs
+- Site-specific auto-mute rules
+- Badge or richer status indicators
+- Session-level mute history
+- Mute on tab open
+
+## Notes
+
+This repository is intentionally small. The current version focuses on reliable tab mute toggling and accurate toolbar state instead of adding popup UI or configuration screens early.
